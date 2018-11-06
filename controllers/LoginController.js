@@ -29,6 +29,7 @@ router.post('/register', function (req, res, next) {
     });
 });
 router.get('/:email/:password', function (req, res, next) {
+    console.log("in login");
     LoginModel.getLoginByEmail(req.params.email).then(login => {
         UserModel.findUserByLogin(login._id).then(user => {
             console.log(user, "user");

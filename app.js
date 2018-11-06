@@ -17,59 +17,65 @@ const RegisterController = require('./controllers/RegisterController');
 
 const app = express();
 
-DBConnection.connect();
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", `${process.env.FE_URL}`);
     res.header("Access-Control-Request-Headers", "*");
     res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
-app.use('/login', LoginController);
-app.use('/register', RegisterController);
+
+DBConnection.connect();
 app.use(function (req, res, next) {
-    if(req.method === 'OPTIONS') {
-        next();
+    if (req.method === 'OPTIONS') {
+        res.send(200);
     }
     else {
-        let token = req.headers['authorization'].replace('Bearer ', "");
-        if(!token) {
-            return res.status(401).json({
-                success: false,
-                message: "No token, please log in"
-            });
-        }
-        jwt.verify(token, process.env.JWT_SECRET, function(err, login) {
-            if(err) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Token not valid, Please login again"
-                });
-            }
-            else {
-                req.login = login;
-                next();
-            }
-        });
+        next();
     }
 });
-app.use('/users', userController);
-app.use('/meals', mealController);
-app.use('/activities', ActivityController);
-app.use('/admin', AdminController);
-app.use('/ingredients', IngredientController);
-app.use('/days', DayController);
+app.use('/api/login', LoginController);
+app.use('/api/register', RegisterController);
+app.use(function (req, res, next) {
+    let token = req.headers['authorization'].replace('Bearer ', "");
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: "No token, please log in"
+        });
+    }
+    jwt.verify(token, process.env.JWT_SECRET, function (err, login) {
+        if (err) {
+            return res.status(401).json({
+                success: false,
+                message: "Token not valid, Please login again"
+            });
+        }
+        else {
+            req.login = login;
+            next();
+        }
+    });
+
+});
+app.use('/api/users', userController);
+app.use('/api/meals', mealController);
+app.use('/api/activities', ActivityController);
+app.use('/api/admin', AdminController);
+app.use('/api/ingredients', IngredientController);
+app.use('/api/days', DayController);
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // // error handler

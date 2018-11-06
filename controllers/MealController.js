@@ -16,28 +16,13 @@ router.get('', function (req, res, next) {
         res.status(200).json({selectedIds: values[0], items: values[1]});
     })
 });
-// router.get('/:day', function (req, res, next) {
-//     WeekPlanModel.getDayId(req.params.day, req.login._id).then(dayId => {
-//         DayModel.getDay(dayId).then(day => {
-//             const meals = MealModel.getMealsById(day.meals);
-//             const activities = ActivityModel.getActivitiesById(day.activities);
-//
-//             Promise.all([meals, activities]).then(values => {
-//                 res.status(200).json({
-//                     meals: values[0],
-//                     activities: values[1]
-//                 });
-//             });
-//         });
-//     });
-// });
+
 router.get('/ids/', function (req, res, next) {
     let idArray = [];
 
     for (let [key, value] of Object.entries(req.query)) {
         idArray.push(value);
     }
-
     MealModel.getMealsById(idArray).then(meals => {
         res.status(200).json(meals);
     })
@@ -49,28 +34,9 @@ router.get('/:dayId', function (req, res, next) {
     Promise.all([selectedIds, allMeals]).then((values) => {
         res.status(200).json({selectedIds: values[0], items: values[1]});
     })
-    // DayModel.getDay(req.params.dayId).then(day => {
-    //     MealModel.getMealsById(day.meals).then(meals=> {
-    //         res.status(200).json({
-    //             selectedIds: [],
-    //             items: meals
-    //         })
-    //     })
-    // })
-
-    // DayModel.getDay(req.params.dayId).then(day => {
-    //     const meals = MealModel.getMealsById(day.meals);
-    //     const activities = ActivityModel.getActivitiesById(day.activities);
-    //
-    //     Promise.all([meals, activities]).then(values => {
-    //         res.status(200).json({
-    //             meals: values[0],
-    //             activities: values[1]
-    //         });
-    //     });
-    // });
 });
 router.post('', function (req, res, next) {
+    console.log(req.body);
     MealModel.createMeal(req.body).then(meal => {
         res.json(meal);
     })

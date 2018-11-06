@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 router.get('/confirmation/:token', function (req, res, next) {
     RegisterTokenModel.getToken(req.params.token).then(token => {
         LoginModel.verifyLogin(token.loginId).then(login => {
-            res.redirect('http://192.168.1.124:3000');
+            res.redirect(process.env.FE_URL);
         });
     })
 });

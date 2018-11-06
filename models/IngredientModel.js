@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 
 const IngredientSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    name: String,
     kcal: Number,
-    name: String
+    protein: Number,
+    fat: Number,
+    carbs: Number
 });
 
 const Ingredient = mongoose.model('Ingredient', IngredientSchema);
@@ -13,11 +16,12 @@ module.exports = {
         return Ingredient.find({});
     },
     createIngredient: function (ingredient) {
-        return new Ingredient({
-            _id: new mongoose.Types.ObjectId(),
-            kcal: ingredient.kcal,
-            name: ingredient.name
-        }).save();
+        console.log("creating ingredient", ingredient);
+        let ingredientValues = ingredient.nutrients;
+        ingredientValues._id = new mongoose.Types.ObjectId();
+        ingredientValues.name = ingredient.name;
+
+        return new Ingredient(ingredientValues).save();
     },
     getIngredientsById: function (ids) {
         const ingredientList = ids.map(id => {

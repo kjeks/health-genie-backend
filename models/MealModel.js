@@ -4,6 +4,9 @@ let MealSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
     kcal: Number,
+    protein: Number,
+    fat: Number,
+    carbs: Number,
     ingredientIds: [mongoose.Schema.Types.ObjectId]
 });
 
@@ -16,11 +19,12 @@ module.exports = {
         });
     },
     createMeal: function (meal) {
-        return new Meal({
-            _id: new mongoose.Types.ObjectId(),
-            name: meal.name,
-            kcal: meal.kcal
-        }).save();
+        let mealValues = meal.nutrients;
+
+        mealValues._id = new mongoose.Types.ObjectId();
+        mealValues.name = meal.name;
+
+        return new Meal(mealValues).save();
     },
     updateMealById: function (id, name, kcal) {
         return Meal.findOneAndUpdate({_id: id}, {name: name, kcal: kcal})
