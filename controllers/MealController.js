@@ -1,12 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const MealModel = require('../models/MealModel');
-const ActivityModel = require('../models/ActivityModel');
 const UserModel = require('../models/UserModel');
 const IngredientModel = require('../models/IngredientModel');
-const DayModel = require('../models/DayModel');
-const WeekPlanModel = require('../models/WeekPlanModel');
-const queryString = require('query-string');
 
 router.get('', function (req, res, next) {
     const selectedIds = UserModel.getSelectedMealIds(req.login._id);

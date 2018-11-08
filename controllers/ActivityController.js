@@ -17,7 +17,7 @@ router.get('/ids/', function (req, res, next) {
     for (let [key, value] of Object.entries(req.query)) {
         idArray.push(value);
     }
-    console.log(idArray, "array");
+
     ActivityModel.getActivitiesById(idArray).then(activities => {
         console.log(activities, "activities");
         res.status(200).json(activities);
