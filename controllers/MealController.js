@@ -9,7 +9,7 @@ router.get('', function (req, res, next) {
     const allMeals = MealModel.getAllMeals();
 
     Promise.all([selectedIds, allMeals]).then((values) => {
-        res.status(200).json({selectedIds: values[0], items: values[1]});
+        res.status(200).json({selectedIds: [], items: values[1]});
     })
 });
 

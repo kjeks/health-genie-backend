@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     activityLevel: Number,
     sex: String,
     age: Number,
-    selectedMealIds: [mongoose.Schema.Types.ObjectId],
+    selectedMealIds: [ mongoose.Schema.Types.ObjectId],
     selectedActivityIds: [mongoose.Schema.Types.ObjectId]
 });
 const User = mongoose.model('User', UserSchema);

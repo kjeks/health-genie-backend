@@ -7,7 +7,7 @@ const ActivityModel = require('../models/ActivityModel');
 const UserModel = require('../models/UserModel');
 
 router.post('/new', function (req, res, next) {
-    DayModel.createDay(req.body.mealIds, req.body.activityIds, req.login._id, req.body.dayName).then(day => {
+    DayModel.createDay(req.body.meals, req.body.activities, req.login._id, req.body.dayName).then(day => {
         res.status(200).json(day);
     })
 });

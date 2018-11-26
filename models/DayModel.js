@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const DaySchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    activities: [mongoose.Schema.Types.ObjectId],
-    meals: [mongoose.Schema.Types.ObjectId],
+    activities: [{
+        activityId: mongoose.Schema.Types.ObjectId,
+        quantity: Number
+    }],
+    meals: [{
+        mealId: mongoose.Schema.Types.ObjectId,
+        quantity: Number
+    }],
     ownerLogin: mongoose.Schema.Types.ObjectId,
     name: String
 });
@@ -11,15 +17,22 @@ const DaySchema = new mongoose.Schema({
 const Day = mongoose.model('Day', DaySchema);
 
 module.exports = {
-    createDay(mealIds, activityIds, loginId, name) {
+    createDay(mealsObj, activityObj, loginId, name) {
+        const meals = mealsObj.map(meal => {
+            return {id: meal[0], quantity: meal[1].grams}
+        });
+        const activities = activityObj.map(activity => {
+            return {id: activity[0], quantity: activity[1].minutes}
+        });
         return new Day({
             _id: mongoose.Types.ObjectId(),
-            activities: activityIds,
-            meals: mealIds,
+            activities: activities,
+            meals: meals,
             ownerLogin: loginId,
             name: name
         }).save()
     },
+
     getDaysByLoginId(loginId) {
         return Day.find({ownerLogin: loginId}).then(days => {
             return days.map(day => {
