@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const DaySchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     activities: [{
-        activityId: mongoose.Schema.Types.ObjectId,
+        _id: mongoose.Schema.Types.ObjectId,
         quantity: Number
     }],
     meals: [{
-        mealId: mongoose.Schema.Types.ObjectId,
+        _id: mongoose.Schema.Types.ObjectId,
         quantity: Number
     }],
     ownerLogin: mongoose.Schema.Types.ObjectId,
@@ -19,10 +19,11 @@ const Day = mongoose.model('Day', DaySchema);
 module.exports = {
     createDay(mealsObj, activityObj, loginId, name) {
         const meals = mealsObj.map(meal => {
-            return {id: meal[0], quantity: meal[1].grams}
+            return {_id: meal[0], quantity: meal[1]}
         });
+        console.log(activityObj, "act obj");
         const activities = activityObj.map(activity => {
-            return {id: activity[0], quantity: activity[1].minutes}
+            return {_id: activity[0], quantity: activity[1]}
         });
         return new Day({
             _id: mongoose.Types.ObjectId(),
@@ -40,6 +41,7 @@ module.exports = {
             })
         })
     },
+
 
     getDay(dayId) {
         return Day.findOne({_id: dayId})

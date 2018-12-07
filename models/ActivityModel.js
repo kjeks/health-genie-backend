@@ -12,13 +12,6 @@ module.exports = {
     getAllActivities: function () {
         return Activity.find({});
     },
-    createFakeActivity: function () {
-        new Activity({
-            _id: mongoose.Types.ObjectId(),
-            name: "jogging(1h)",
-            kcal: 850
-        }).save();
-    },
     updateActivityById: function (id, name, kcal) {
         return Activity.findOneAndUpdate({_id: id}, {name: name, kcal: kcal})
     },
@@ -37,15 +30,20 @@ module.exports = {
         return Activity.findOne({_id: id});
     },
     getKcalByIds: function (ids) {
-        return this.getActivitiesById(ids).then(activities => {
-            const activityReducer = (currentValue, activity) => {
-                return activity.kcal + currentValue;
-            };
+        const activities = ids.map(id => {
+            return this.getActivityById(id._id).then(activities => {
+                const quantity = id.quantity;
 
-            return activities.reduce(activityReducer, 0)
-        }).catch(err => {
-            console.log(err);
-        })
+                return activities.kcal * quantity/100;
+            });
+        });
+
+        return Promise.all(activities).then(values => {
+            const activityReducer = (currentValue, activityKcal) => {
+                return activityKcal + currentValue;
+            };
+            return values.reduce(activityReducer, 0);
+        });
 
     }
 };

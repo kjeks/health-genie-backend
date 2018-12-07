@@ -81,21 +81,28 @@ module.exports = {
         const meals = ids.map(id => {
             return this.getMealById(id);
         });
+
         return Promise.all(meals).then(values => {
             return values;
         })
     },
     getMealById: function (id) {
-        return Meal.findOne({_id: id});
+        return OfficalMeal.findOne({_id: id})
     },
     getKcalByIds: function (ids) {
-        return this.getMealsById(ids).then(meals => {
-            const mealReducer = (currentValue, meal) => {
-                return meal.kcal + currentValue;
+        const meals = ids.map(id => {
+            return this.getMealById(id._id).then(meal => {
+                const quantity = id.quantity;
+
+                return meal.macros.kcal * quantity/100;
+            });
+        });
+
+        return Promise.all(meals).then(values => {
+            const mealReducer = (currentValue, mealKcal) => {
+                return mealKcal + currentValue;
             };
-            return meals.reduce(mealReducer, 0)
-        }).catch(err => {
-            console.log(err);
-        })
+            return values.reduce(mealReducer, 0);
+        });
     }
 };

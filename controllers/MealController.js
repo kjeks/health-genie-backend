@@ -3,6 +3,7 @@ const router = express.Router();
 const MealModel = require('../models/MealModel');
 const UserModel = require('../models/UserModel');
 const IngredientModel = require('../models/IngredientModel');
+const queryString = require('query-string');
 
 router.get('', function (req, res, next) {
     const selectedIds = UserModel.getSelectedMealIds(req.login._id);
@@ -17,7 +18,8 @@ router.get('/ids/', function (req, res, next) {
     let idArray = [];
 
     for (let [key, value] of Object.entries(req.query)) {
-        idArray.push(value);
+        const parsedValue = queryString.parse(value);
+        idArray.push(parsedValue._id);
     }
     MealModel.getMealsById(idArray).then(meals => {
         res.status(200).json(meals);
@@ -32,7 +34,6 @@ router.get('/:dayId', function (req, res, next) {
     })
 });
 router.post('', function (req, res, next) {
-    console.log(req.body);
     MealModel.createMeal(req.body).then(meal => {
         res.json(meal);
     })

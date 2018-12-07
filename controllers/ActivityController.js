@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ActivityModel = require('../models/ActivityModel');
 const UserModel = require('../models/UserModel');
+const queryString = require('query-string');
 
 router.get('', function(req, res, next) {
     const selectedIds = UserModel.getSelectedActivityIds(req.login._id);
@@ -15,11 +16,11 @@ router.get('/ids/', function (req, res, next) {
     let idArray = [];
 
     for (let [key, value] of Object.entries(req.query)) {
-        idArray.push(value);
+        const parsedValue = queryString.parse(value);
+        idArray.push(parsedValue._id);
     }
 
     ActivityModel.getActivitiesById(idArray).then(activities => {
-        console.log(activities, "activities");
         res.status(200).json(activities);
     })
 });
