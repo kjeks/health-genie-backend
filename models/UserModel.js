@@ -11,8 +11,9 @@ const UserSchema = new mongoose.Schema({
     activityLevel: Number,
     sex: String,
     age: Number,
-    selectedMealIds: [ mongoose.Schema.Types.ObjectId],
-    selectedActivityIds: [mongoose.Schema.Types.ObjectId]
+    favoriteMealIds: [ mongoose.Schema.Types.ObjectId],
+    favoriteActivityIds: [mongoose.Schema.Types.ObjectId],
+    favoriteIngredientIds: [mongoose.Schema.Types.ObjectId]
 });
 const User = mongoose.model('User', UserSchema);
 
@@ -29,8 +30,9 @@ module.exports = {
             activityLevel: 1,
             sex: "male",
             age: 25,
-            selectedMealIds: [],
-            selectedActivityIds: []
+            favoriteMealIds: [],
+            favoriteActivityIds: [],
+            favoriteIngredientIds: []
         });
         return newUser.save()
     },
@@ -41,21 +43,47 @@ module.exports = {
         return User.findOneAndUpdate({loginId: id}, user)
     },
     saveMealList: function (mealIdsList, id) {
-        return User.findOneAndUpdate({loginId: id}, {selectedMealIds: mealIdsList});
+        return User.findOneAndUpdate({loginId: id}, {favoriteMealIds: mealIdsList});
     },
     saveActivityList: function (activityIdList, id) {
-        return User.findOneAndUpdate({loginId: id}, {selectedActivityIds: activityIdList});
+        return User.findOneAndUpdate({loginId: id}, {favoriteActivityIds: activityIdList});
     },
-    getSelectedMealIds: function (loginId) {
+    getFavoriteMealIds: function (loginId) {
         return User.findOne({loginId: loginId}).then(user => {
-            return user.selectedMealIds
+            return user.favoriteMealIds
+        })
+    },
+    getFavoriteIngredientIds: function (loginId) {
+        return User.findOne({loginId: loginId}).then(user => {
+             return user.favoriteIngredientIds
         })
     },
     getSelectedActivityIds: function (loginId) {
         return User.findOne({loginId: loginId}).then(user => {
-            return user.selectedActivityIds
+            return user.favoriteActivityIds
         })
     },
+    toggleFavoriteIngredient: function (ingredientId, loginId) {
+        return User.findOne({loginId: loginId}).then(user=> {
+            const IngredientIsFavorite = user.favoriteIngredientIds.some((favoriteIngredientId)=> {
+                return favoriteIngredientId.equals(ingredientId)
+            });
+            return IngredientIsFavorite ?
+                User.findOneAndUpdate({loginId: loginId}, {$pull: {favoriteIngredientIds: ingredientId}}, {new: true}):
+                User.findOneAndUpdate({loginId: loginId}, {$push: {favoriteIngredientIds: ingredientId}}, {new: true})
+        });
+    },
+    toggleFavoriteMeal(mealId, loginId){
+        return User.findOne({loginId: loginId}).then(user=> {
+            const mealIsFavorite = user.favoriteMealIds.some((favoriteMealId)=> {
+                return favoriteMealId.equals(mealId)
+            });
+            return mealIsFavorite ?
+                User.findOneAndUpdate({loginId: loginId}, {$pull: {favoriteMealIds: mealId}}, {new: true}):
+                User.findOneAndUpdate({loginId: loginId}, {$push: {favoriteMealIds: mealId}}, {new: true})
+        });
+    },
+
     getCaloriesUsedByLogin: function (loginId) {
         return User.findOne({loginId: loginId}).then(user => {
             return this.getBRMByLogin(loginId).then(BRM => {

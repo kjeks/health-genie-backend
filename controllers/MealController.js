@@ -6,12 +6,17 @@ const IngredientModel = require('../models/IngredientModel');
 const queryString = require('query-string');
 
 router.get('', function (req, res, next) {
-    const selectedIds = UserModel.getSelectedMealIds(req.login._id);
+    const favoriteMeals = UserModel.getFavoriteMealIds(req.login._id);
     const allMeals = MealModel.getAllMeals();
 
-    Promise.all([selectedIds, allMeals]).then((values) => {
-        res.status(200).json({selectedIds: [], items: values[1]});
+    Promise.all([favoriteMeals, allMeals]).then((values) => {
+        res.status(200).json({favoriteItemIds: values[0], items: values[1]});
     })
+});
+router.post('/favorite/:mealId', (req, res, next)=> {
+    UserModel.toggleFavoriteMeal(req.params.mealId, req.login._id).then((user)=> {
+        res.status(200).json({favoriteItemIds: user.favoriteMealIds})
+    });
 });
 
 router.get('/ids/', function (req, res, next) {
@@ -25,14 +30,7 @@ router.get('/ids/', function (req, res, next) {
         res.status(200).json(meals);
     })
 });
-router.get('/:dayId', function (req, res, next) {
-    const selectedIds = UserModel.getSelectedMealIds(req.login._id);
-    const allMeals = MealModel.getAllMeals();
 
-    Promise.all([selectedIds, allMeals]).then((values) => {
-        res.status(200).json({selectedIds: values[0], items: values[1]});
-    })
-});
 router.post('', function (req, res, next) {
     MealModel.createMeal(req.body).then(meal => {
         res.json(meal);
