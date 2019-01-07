@@ -23,8 +23,10 @@ let OfficialMealSchema = new mongoose.Schema({
         kcal: Number
     },
     detailedNutrients: mongoose.Schema.Types.ObjectId,
-    ingredientIds: [mongoose.Schema.Types.ObjectId]
+    ingredients: [{id: mongoose.Schema.Types.ObjectId, quantity: Number}],
+    ownerId: mongoose.Schema.Types.ObjectId
 });
+
 let Meal = mongoose.model('Meal', MealSchema);
 let OfficalMeal = mongoose.model('OfficialMeal', OfficialMealSchema);
 
@@ -33,6 +35,7 @@ module.exports = {
         return Meal.find({}).then(meals => {
             meals.map(meal => {
                 DetailedNutrientsModel.createDetailedNutrients(meal).then(details => {
+                    console.log(meal, "meal");
                     new OfficalMeal({
                         _id: new mongoose.Types.ObjectId(),
                         name: meal.get('navn'),
@@ -41,10 +44,11 @@ module.exports = {
                             fett: meal.get('Fett'),
                             sukker: meal.get('Sukker, tilsatt') + meal.get('Mono+disakk'),
                             kostfiber: meal.get('Kostfiber'),
+                            karbohydrat: meal.get('Karbohydrat'),
                             kcal: meal.get('Kilokalorier'),
                         },
                         detailedNutrients: details._id
-                    }).save();
+                    }).save()
                 });
             });
         });
@@ -77,6 +81,16 @@ module.exports = {
             ingredientIds: ingredientIds
         }).save();
     },
+    buildOfficialMeal: function (ingredients, macros, detailedNutrients, name, loginId) {
+        return new OfficalMeal({
+            _id: new mongoose.Types.ObjectId(),
+            name: name,
+            macros: macros,
+            detailedNutrients: detailedNutrients,
+            ingredients: ingredients,
+            ownerId: loginId
+        }).save();
+    },
     getMealsById: function (ids) {
         const meals = ids.map(id => {
             return this.getMealById(id);
@@ -104,5 +118,8 @@ module.exports = {
             };
             return values.reduce(mealReducer, 0);
         });
+    },
+    getMealsMadeById: function (ownerId) {
+        return OfficalMeal.find({ownerId: ownerId});
     }
 };

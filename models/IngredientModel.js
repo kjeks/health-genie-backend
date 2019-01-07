@@ -39,6 +39,7 @@ module.exports = {
                             fett: ingredient.get('Fett'),
                             sukker: ingredient.get('Sukker, tilsatt') + ingredient.get('Mono+disakk'),
                             kostfiber: ingredient.get('Kostfiber'),
+                            karbohydrat: ingredient.get('Karbohydrat'),
                             kcal: ingredient.get('Kilokalorier'),
                         },
                         detailedNutrients: details._id
@@ -55,7 +56,6 @@ module.exports = {
         return Ingredient.find({});
     },
     createIngredient: function (ingredient) {
-        console.log("creating ingredient", ingredient);
         let ingredientValues = ingredient.nutrients;
         ingredientValues._id = new mongoose.Types.ObjectId();
         ingredientValues.name = ingredient.name;
@@ -75,25 +75,9 @@ module.exports = {
         })
     },
     getNutritientsInIngredient: function (id) {
-        return Ingredient.findOne({_id: id}).then(ingredient => {
-            return {kcal: ingredient.kcal};
+        return OfficialIngredient.findOne({_id: id}).then(ingredient => {
+            return {macros: ingredient.macros, detailedNutrients: ingredient.detailedNutrients}
         })
     },
-    getNutrientsInIngredientList: function (ids) {
-        const nutrients = ids.map(id => {
-            return new Promise((resolve, reject) => {
-                resolve(this.getNutritientsInIngredient(id));
-            });
-        });
 
-        return Promise.all(nutrients).then(nutrients => {
-            console.log(nutrients, "nut");
-            let nutrientInIngredients = {kcal: 0};
-            nutrients.forEach(nutrient => {
-                nutrientInIngredients.kcal = nutrientInIngredients.kcal + nutrient.kcal;
-            });
-            console.log(nutrientInIngredients, "ing");
-            return nutrientInIngredients;
-        })
-    }
 };

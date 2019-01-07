@@ -42,7 +42,7 @@ app.use(function (req, res, next) {
     }
 });
 app.use('/api/login', LoginController);
-app.use('/api/register', RegisterController);
+app.use('/register', RegisterController);
 app.use(function (req, res, next) {
     let token = req.headers['authorization'].replace('Bearer ', "");
     if (!token) {
