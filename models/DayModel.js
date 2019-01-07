@@ -21,7 +21,6 @@ module.exports = {
         const meals = mealsObj.map(meal => {
             return {_id: meal[0], quantity: meal[1]}
         });
-        console.log(activityObj, "act obj");
         const activities = activityObj.map(activity => {
             return {_id: activity[0], quantity: activity[1]}
         });
@@ -41,7 +40,6 @@ module.exports = {
             })
         })
     },
-
 
     getDay(dayId) {
         return Day.findOne({_id: dayId})

@@ -6,9 +6,9 @@ const queryString = require('query-string');
 
 router.get('', function(req, res, next) {
     const selectedIds = UserModel.getSelectedActivityIds(req.login._id);
-    const allMeals = ActivityModel.getAllActivities();
+    const allActivities = ActivityModel.getAllActivities();
 
-    Promise.all([selectedIds, allMeals]).then((values) => {
+    Promise.all([selectedIds, allActivities]).then((values) => {
         res.status(200).json({selectedIds: values[0], items: values[1]});
     })
 });

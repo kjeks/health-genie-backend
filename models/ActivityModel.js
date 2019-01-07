@@ -34,7 +34,7 @@ module.exports = {
             return this.getActivityById(id._id).then(activities => {
                 const quantity = id.quantity;
 
-                return activities.kcal * quantity/100;
+                return activities.kcal * quantity;
             });
         });
 

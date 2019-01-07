@@ -13,8 +13,32 @@ router.post('/new', function (req, res, next) {
 });
 router.get('', function (req, res, next) {
     DayModel.getDaysByLoginId(req.login._id).then(days => {
-        res.status(200).json({items: days, selectedIds: []});
-    })
+        days = days.map(day => {
+            return new Promise(resolve => {
+                const act = Promise.all(day.activities.map(activity => {
+                    return ActivityModel.getActivityById(activity._id).then(activityObj => {
+                        return {activity: activityObj, quantity: activity.quantity};
+                    })
+                }));
+                const meals = Promise.all(day.meals.map(meal => {
+                    return MealModel.getMealById(meal._id).then(mealObj => {
+                        return {meal: mealObj, quantity: meal.quantity};
+                    })
+                }));
+                Promise.all([act, meals]).then(values => {
+                    resolve({
+                        activities: values[0],
+                        meals: values[1],
+                        name: day.name,
+                        _id: day._id
+                    })
+                })
+            });
+        });
+        Promise.all(days).then(values => {
+            res.status(200).json({items: values})
+        });
+    });
 });
 router.get('/plans', function (req, res, next) {
     WeekPlanModel.getAllDays(req.login._id).then(week => {
