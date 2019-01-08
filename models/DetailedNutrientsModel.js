@@ -92,7 +92,7 @@ module.exports = {
             }
         }).save();
     },
-    createFromIdAndQuantity: function (items) {
+    createFromIdAndQuantity: function (items, summedQuantitites) {
         let updatedValues = [];
         items.forEach(item => {
             const id = item[0];
@@ -100,16 +100,16 @@ module.exports = {
             updatedValues.push(new Promise(resolve => {
                 return DetailedNutrients.findOne({_id: id}).then(detailedNutrient => {
                     const updatedFat = ObjectMap(detailedNutrient.fett, function (value) {
-                        return value * quantity / 100;
+                        return value * quantity / summedQuantitites;
                     });
                     const updatedMinerals = ObjectMap(detailedNutrient.mineraler, function (value) {
-                        return value * quantity / 100;
+                        return value * quantity / summedQuantitites;
                     });
                     const updatedVitamins = ObjectMap(detailedNutrient.vitaminer, function (value) {
-                        return value * quantity / 100;
+                        return value * quantity / summedQuantitites;
                     });
                     const updatedCarbs = ObjectMap(detailedNutrient.karbohydrater, function (value) {
-                        return value * quantity / 100;
+                        return value * quantity / summedQuantitites;
                     });
                     resolve({
                         fat: updatedFat,
@@ -133,10 +133,10 @@ module.exports = {
                 karbohydrater: {
                     stivelse: 0,
                     monoDisakk: 0,
-                    kostFiber: 0
+                    kostfiber: 0
                 },
                 vitaminer: {
-                    //A: 0,
+                    A: 0,
                     D: 0,
                     E: 0,
                     B6: 0,
@@ -151,7 +151,7 @@ module.exports = {
                 },
                 mineraler: {
                     jod: 0,
-                    fosFor: 0,
+                    fosfor: 0,
                     kopper: 0,
                     selen: 0,
                     sink: 0,

@@ -11,7 +11,7 @@ router.get('', function (req, res, next) {
     const selfMadeMeals = MealModel.getMealsMadeById(req.login._id);
     const allMeals = MealModel.getAllMeals();
     Promise.all([favoriteMeals, allMeals, selfMadeMeals]).then((values) => {
-        const selfMadeMealIds = values[2].map(function(meal) {
+        const selfMadeMealIds = values[2].map(function (meal) {
             return meal._id;
         });
         res.status(200).json({favoriteItemIds: values[0], selfMadeItemIds: selfMadeMealIds, items: values[1]});
@@ -43,17 +43,21 @@ router.post('', function (req, res, next) {
 router.post('/build', function (req, res, next) {
     let detailedNutrients = [];
     let macroList = [];
+    const summedQuantityReducer = (accumulator, currentValue) => {
+        return accumulator + Number(currentValue[1]);
+    };
+    const summedQuantities = req.body.ingredients.reduce(summedQuantityReducer, 0);
 
     for (let [id, quantity] of req.body.ingredients) {
         detailedNutrients.push(new Promise(resolve => {
             IngredientModel.getNutritientsInIngredient(id).then(nutrients => {
                 const quantityMacros = {
-                    protein: nutrients.macros.protein * quantity/100,
-                    karbohydrat: nutrients.macros.karbohydrat * quantity/100,
-                    kcal: nutrients.macros.kcal * quantity/100,
-                    fett: nutrients.macros.fett * quantity/100,
-                    sukker: nutrients.macros.sukker * quantity/100,
-                    kostfiber: nutrients.macros.kostfiber * quantity/100
+                    protein: nutrients.macros.protein * quantity / summedQuantities,
+                    karbohydrat: nutrients.macros.karbohydrat * quantity / summedQuantities,
+                    kcal: nutrients.macros.kcal * quantity / summedQuantities,
+                    fett: nutrients.macros.fett * quantity / summedQuantities,
+                    sukker: nutrients.macros.sukker * quantity / summedQuantities,
+                    kostfiber: nutrients.macros.kostfiber * quantity / summedQuantities
                 };
 
                 macroList.push(quantityMacros);
@@ -71,21 +75,19 @@ router.post('/build', function (req, res, next) {
             karbohydrat: 0
         };
         macroList.forEach(macros => {
-            for(let [key, values] of Object.entries(summedMacros)){
+            for (let [key, values] of Object.entries(summedMacros)) {
                 summedMacros[key] += macros[key]
             }
         });
-        const ingredients = req.body.ingredients.map(function([id, quantity]) {
+        const ingredients = req.body.ingredients.map(function ([id, quantity]) {
             return {id: id, quantity: Number(quantity)}
         });
-
-        DetailedNutrientsModel.createFromIdAndQuantity(values).then(detailedNutrients => {
+        DetailedNutrientsModel.createFromIdAndQuantity(values, summedQuantities).then(detailedNutrients => {
             MealModel.buildOfficialMeal(ingredients, summedMacros, detailedNutrients._id, req.body.name, req.login._id).then(meal => {
                 res.status(202);
             })
         });
-    })
+    });
 });
-
 
 module.exports = router;
