@@ -43,6 +43,8 @@ router.get('', function (req, res, next) {
 router.get('/plans', function (req, res, next) {
     WeekPlanModel.getAllDays(req.login._id).then(week => {
         res.status(200).json(week);
+    }).catch(error => {
+        console.log(error);
     })
 });
 router.post('/new/week', function (req, res, next) {

@@ -25,10 +25,8 @@ router.post('/favorite/:mealId', (req, res, next) => {
 
 router.get('/ids/', function (req, res, next) {
     let idArray = [];
-
     for (let [key, value] of Object.entries(req.query)) {
-        const parsedValue = queryString.parse(value);
-        idArray.push(parsedValue._id);
+        idArray.push(value);
     }
     MealModel.getMealsById(idArray).then(meals => {
         res.status(200).json(meals);
