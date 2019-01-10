@@ -31,6 +31,12 @@ let Meal = mongoose.model('Meal', MealSchema);
 let OfficalMeal = mongoose.model('OfficialMeal', OfficialMealSchema);
 
 module.exports = {
+    removeBrokenMeals: function() {
+        return OfficalMeal.findOneAndDelete({name: ''});
+    },
+    removeMealtypeHeaders: function () {
+        return OfficalMeal.remove({"macros.kcal": null})
+    },
     updateToComplex: function () {
         return Meal.find({}).then(meals => {
             meals.map(meal => {

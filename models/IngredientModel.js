@@ -27,6 +27,12 @@ const Ingredient = mongoose.model('Ingredient', IngredientSchema);
 const OfficialIngredient = mongoose.model('OfficialIngredient', OfficialIngredientSchema);
 
 module.exports = {
+    removeBrokenIngredients: function() {
+        return OfficialIngredient.findOneAndDelete({name: ''})
+    },
+    removeIngredienttypeHeaders: function () {
+        return OfficialIngredient.remove({"macros.kcal": null})
+    },
     updateToComplex: function () {
         return Ingredient.find({}).then(ingredients => {
             ingredients.map(ingredient => {
@@ -52,9 +58,7 @@ module.exports = {
     getAllOfficialIngredients: function () {
         return OfficialIngredient.find({}).sort({name: 1});
     },
-    getAllIngredients: function () {
-        return Ingredient.find({});
-    },
+
     createIngredient: function (ingredient) {
         let ingredientValues = ingredient.nutrients;
         ingredientValues._id = new mongoose.Types.ObjectId();
@@ -62,18 +66,7 @@ module.exports = {
 
         return new Ingredient(ingredientValues).save();
     },
-    getIngredientsById: function (ids) {
-        const ingredientList = ids.map(id => {
-            return new Promise((resolve, reject) => {
-                Ingredient.findOne({_id: id}).then(ingredient => {
-                    resolve(ingredient);
-                })
-            });
-        });
-        return Promise.all(ingredientList).then(ingredients => {
-            return ingredients;
-        })
-    },
+
     getNutritientsInIngredient: function (id) {
         return OfficialIngredient.findOne({_id: id}).then(ingredient => {
             return {macros: ingredient.macros, detailedNutrients: ingredient.detailedNutrients}

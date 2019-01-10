@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ActivityModel = require('../models/ActivityModel');
+const IngredientModel = require('../models/IngredientModel');
 const MealModel = require('../models/MealModel');
 
 router.post('/:id', function (req, res, next) {
@@ -28,6 +29,16 @@ router.post('/:id/:type', function(req, res, next) {
             res.status(200).json({});
         })
     }
+});
+router.get('/ingredients/clean', (req, res, next) => {
+    IngredientModel.removeBrokenIngredients();
+    IngredientModel.removeIngredienttypeHeaders();
+    res.status(202);
+});
+router.get('/meals/clean', (req, res, next) => {
+    MealModel.removeBrokenMeals();
+    MealModel.removeMealtypeHeaders();
+    res.status(202);
 });
 
 module.exports = router;
