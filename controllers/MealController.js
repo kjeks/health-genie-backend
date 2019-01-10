@@ -6,12 +6,22 @@ const IngredientModel = require('../models/IngredientModel');
 const DetailedNutrientsModel = require('../models/DetailedNutrientsModel');
 const queryString = require('query-string');
 
+function nameSort (a, b) {
+    if(a.name < b.name) {
+        return -1;
+    }
+    if(b.name < b.name) {
+        return 1;
+    }
+}
+
 router.get('', function (req, res, next) {
     const favoriteMeals = UserModel.getFavoriteMealIds(req.login._id);
     const selfMadeMeals = MealModel.getMealsMadeById(req.login._id);
     const allMeals = MealModel.getAllMeals();
     Promise.all([favoriteMeals, allMeals, selfMadeMeals]).then((values) => {
-        const selfMadeMealIds = values[2].map(function (meal) {
+        const selfMadeMealIds = values[2].sort((a, b) => nameSort(a,b))
+            .map(function (meal) {
             return meal._id;
         });
         res.status(200).json({favoriteItemIds: values[0], selfMadeItemIds: selfMadeMealIds, items: values[1]});

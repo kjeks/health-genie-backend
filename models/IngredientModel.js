@@ -50,7 +50,7 @@ module.exports = {
 
     },
     getAllOfficialIngredients: function () {
-        return OfficialIngredient.find({});
+        return OfficialIngredient.find({}).sort({name: 1});
     },
     getAllIngredients: function () {
         return Ingredient.find({});

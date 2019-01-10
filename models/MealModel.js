@@ -55,7 +55,7 @@ module.exports = {
 
     },
     getAllMeals: function () {
-        return OfficalMeal.find({}).then(meals => {
+        return OfficalMeal.find({}).sort({'name': 1}).then(meals => {
             return meals;
         });
     },
